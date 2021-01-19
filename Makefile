@@ -6,14 +6,14 @@
 #    By: awerebea <awerebea@student.21-school.ru>   +#+  +:+       +#+         #
 #                                                 +#+#+#+#+#+   +#+            #
 #    Created: 2020/12/15 10:44:20 by awerebea          #+#    #+#              #
-#    Updated: 2021/01/12 15:11:42 by awerebea         ###   ########.fr        #
+#    Updated: 2021/01/19 19:39:02 by awerebea         ###   ########.fr        #
 #                                                                              #
 # **************************************************************************** #
 
 NAME		= webserv
 CONFIG		= webserv.conf
 
-INCLUDES	= -I includes/
+INCLUDES	= -I src/
 CXX			= clang++
 
 CFLAGS		= -Wall -Wextra -Werror
@@ -29,7 +29,7 @@ ifeq ($(OS), Linux)
 endif
 
 #------------------------------------ compiling --------------------------------
-SRCDIR		=
+SRCDIR		= src/
 OBJDIR		= obj/
 
 DIR_ROOT	=

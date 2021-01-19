@@ -6,7 +6,7 @@
 /*   By: awerebea <awerebea@student.21-school.ru>   +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2020/12/22 19:53:23 by awerebea          #+#    #+#             */
-/*   Updated: 2021/01/15 21:15:12 by awerebea         ###   ########.fr       */
+/*   Updated: 2021/01/19 20:28:59 by awerebea         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -34,14 +34,6 @@
 					};
 
 					Response::~Response() {
-//						if (response.data_begin_p) {
-//							free(response.data_begin_p);
-//							response.data_begin_p = nullptr;
-//						}
-//						 if (body) {
-//						     free(body);
-//						     body = nullptr;
-//						 }
 						if (cgi)
 							delete cgi;
 						if (response.headers) {
@@ -144,8 +136,6 @@ void Response::cgi_response_parser(Cgi &cgi){
 	ft_memcpy(response.headers, responseHeaders.c_str(), responseHeaders.length());
 	response.headersCurr = response.headers;
 	if (bodyLength) {
-		// ft_memcpy(response.data + responseHeaders.length(), cgi_buff + pos,
-		//         bodyLength);
 		response.body = cgi_buff + pos;
 		response.shiftBody = pos;
 		response.bodyCurr = response.body;
@@ -351,7 +341,7 @@ void				Response::responsePrepare(int & status, map_type * data,
 			errorHandler();
 			buildResponse();
 			if (errCode != 404)
-				status = 3; // QUESTION where should be set and which value
+				status = 3;
 			return ;
 		} else {
 			int			ret = 0;
@@ -405,7 +395,7 @@ void				Response::responsePrepare(int & status, map_type * data,
 				errorHandler();
 				buildResponse();
 				if (errCode != 404)
-					status = 3; // QUESTION where should be set and which value
+					status = 3;
 				return ;
 			}
 			// check file size limit (for PUT and POST)
@@ -466,7 +456,7 @@ void				Response::responsePrepare(int & status, map_type * data,
 			errorHandler();
 			buildResponse();
 			if (errCode != 404)
-				status = 3; // QUESTION where should be set and which value
+				status = 3;
 			return ;
 		}
 		catch (std::exception & e) {
@@ -482,7 +472,7 @@ void				Response::responsePrepare(int & status, map_type * data,
 void				Response::errorHandler() {
 	// check if error pages paths not set in config
 	if (!errorPage || !errorPage->count(errCode)) {
-		generateBody(); // TODO check if all possible templates are implemented
+		generateBody();
 		return ;
 	}
 
@@ -859,14 +849,6 @@ int					Response::checkFile() {
 	if (!(stat(filePath.c_str(), & statbuf))) {
 		// check if 'filePath' is directory
 		if (statbuf.st_mode & S_IFDIR) {
-			// if path to dir not ended by '/' init redirect
-			if (filePath[filePath.length() - 1] != '/') {
-				// redirectURI = filePath.substr(location[currLocationInd]->
-				//         getData().find("root")->second[0].length()) + "/";
-				redirectURI = _data->find("head")->second[1] + "/";
-				errCode = 302;
-				return 1;
-			}
 			// check if owner or group has execute access to directory
 			if (statbuf.st_mode & S_IXUSR || statbuf.st_mode & S_IXGRP) {
 				// get vector with names of index pages from specified location
@@ -902,9 +884,6 @@ int					Response::checkFile() {
 							}
 						}
 					}
-					// file of index pages vector not found QUESTION
-					// errCode = 404;
-					// return ;
 				}
 				// check autoindex status if index pages are not set in location
 				// case if autoindex off (return 404)
@@ -913,10 +892,15 @@ int					Response::checkFile() {
 						getData().end() || itLocationData->second[0] == "off") {
 					errCode = 404;
 					return 1;
-				} else {
-					// case if autoindex on
+				} else { // case if autoindex on
+					// if path to dir not ended by '/' init redirect
+					if (filePath[filePath.length() - 1] != '/') {
+						redirectURI = _data->find("head")->second[1] + "/";
+						errCode = 302;
+						return 1;
+					}
 					errCode = 200;
-					generateDirListing(); // TODO
+					generateDirListing();
 					return 0;
 				}
 			}
@@ -927,7 +911,7 @@ int					Response::checkFile() {
 		// check if owner or group has read access to file
 		else if (statbuf.st_mode & S_IRUSR || statbuf.st_mode & S_IRGRP) {
 			errCode = 200;
-			fileModifiedTime = timeToStr(statbuf.st_mtime); // FIXME +/- 1 year
+			fileModifiedTime = timeToStr(statbuf.st_mtime);
 			return 0;
 		// file is not readble
 		} else {

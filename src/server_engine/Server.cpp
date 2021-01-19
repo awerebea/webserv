@@ -48,11 +48,11 @@ int Server::createSocket(const std::string &host, const int port, int const & i)
 	setsockopt(listen_sock, SOL_SOCKET,  SO_REUSEADDR, &opt, sizeof(opt));
 	if ((bind(listen_sock, (struct sockaddr*)& addr, sizeof(addr))) < 0)
 	{
-		std::cerr << "bind" << std::endl;
+		std::cerr << "bind error" << std::endl;
 		return (500);
 	}
 	if ((listen(listen_sock, 2048)) < 0){
-		std::cerr << "listen_sock" << std::endl;
+		std::cerr << "listen_sock error" << std::endl;
 		return (500);
 	}
 	std::cout << "listening " << port << "..." << std::endl;
@@ -282,7 +282,7 @@ int Server::newSession() {
 			int accept_sock;
 			socklen_t slen = sizeof(addr);
 			if ((accept_sock = accept((*it).getFd(), (struct sockaddr *) &addr, &slen)) < 0) {
-				std::cerr << "accept" << std::endl;
+				std::cerr << "accept error" << std::endl;
 				return (1);
 			}
 			fcntl(accept_sock, F_SETFL, O_NONBLOCK);
